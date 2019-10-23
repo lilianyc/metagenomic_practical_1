@@ -13,26 +13,29 @@ output_dir=$2
 echo "raw reads directory: $raw_reads_dir"
 echo "output directory: $output_dir"
 
+## Preprocessing of files and softwares.
+# Creating the AlienTrimmer binary.
+echo "Creating the AlienTrimmer binary ..."
+# Does not work
+#pwd/soft/JarMaker.sh soft/AlienTrimmer.java
+
+# Unzip the gz files to get fastq files.
+echo "Unzipping fastq.gz files ..."
+gunzip $raw_reads_dir/*.fastq.gz
+
+
 # Creating the output directory.
 mkdir $output_dir
 
-# Creating the AlienTrimmer binary.
-./soft/JarMaker.sh soft/AlienTrimmer.java
-
-# Unzip the gz files to get fastq files.
-echo "Unzipping fastq.gz files"
-gunzip $raw_reads_dir/*.fastq.gz
-
-# Here it supposes the dir name has no "/" appended.
-for file in $raw_reads_dir/*.fastq; do
-    #fastqc $file -o $output_dir
-    java -jar soft/AlienTrimmer.jar -i $file -q 20 -c databases/contaminants.fasta
+# Trimming with AlienTrimmer, assuming only fastq in the raw reads directory
+# and merging with Vsearch.
+for file in $(ls $raw_reads_dir/ *_R1.fastq.gz); do
+    name_R1="$file"
+    name_R2=$(echo $file|sed "s:R1:R2:g")
+    # Trimming.
+    java -jar soft/AlienTrimmer.jar -if $raw_reads_dir/$name_R1 -ir $raw_reads_dir/$name_R2 -q 20 -c databases/contaminants.fasta -of $output_dir/$name_R1 -or $output_dir/$name_R2
+    # Merging
+    echo soft/vsearch --fastq_mergepairs --fastaout name --label_suffix ";sample="
 done
-
-#for file in $(ls $raw_reads_dir); do
-#    name_R1="$file"
-#    name_R2= 'echo $file|sed "s:R1:R2:g"'
-#    echo tes $name_R1 $name_R2
-#done
 
 
