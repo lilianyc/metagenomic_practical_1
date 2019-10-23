@@ -30,22 +30,24 @@ mkdir $output_dir
 # Trimming with AlienTrimmer, assuming only fastq in the raw reads directory
 # and merging with Vsearch.
 : '
-for file in $(ls $raw_reads_dir/ *_R1.fastq); do
-    name_R1="$file"
-    name_R2=$(echo $file|sed "s:R1:R2:g")
+for file in $(ls $raw_reads_dir/*_R1.fastq); do
+    name_R1=$(echo $file|sed "s:$raw_reads_dir\/::g")
+    name_R2=$(echo $file|sed "s:R1:R2:g"|sed "s:$raw_reads_dir\/::g")
+    sample_name=$(echo $name_R1|sed "s:_R.\.fastq$::g")
     # Trimming.
-    java -jar soft/AlienTrimmer.jar -if $raw_reads_dir/$name_R1 -ir $raw_reads_dir/$name_R2 -q 20 -c databases/contaminants.fasta -of $output_dir/$name_R1 -or $output_dir/$name_R2
+    java -jar soft/AlienTrimmer.jar -if $raw_reads_dir/$name_R1 -ir $raw_reads_dir/$name_R2 -q 20 -c databases/contaminants.fasta -of $output_dir/$name_R1 -or $output_dir/$name_R2 -os $output_dir/$sample_name.at.sgl.fq
     # Merging.
-    sample_name=$(echo $file|sed "s:_R.\.fastq$::g")
+    
     soft/vsearch --fastq_mergepairs $output_dir/$name_R1 --reverse $output_dir/$name_R2 --fastaout $output_dir/$sample_name --label_suffix ";sample=$sample_name"
     # Removing spaces.  
     sed "s: ::g" $output_dir/$sample_name >> $output_dir/amplicon.fasta
+    # break
 done
 '
 
 # Working on amplicon.fasta
-soft/vsearch --derep_fulllength $output_dir/amplicon.fasta --sizeout --output tmp.fasta
-
+soft/vsearch --derep_fulllength $output_dir/amplicon.fasta --sizeout --output tmp.fasta --minuniquesize 10
+soft/vsearch --uchime_denovo tmp.fasta
 
 
 
