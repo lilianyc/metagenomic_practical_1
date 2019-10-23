@@ -47,10 +47,17 @@ done
 
 # Working on amplicon.fasta
 #soft/vsearch --derep_fulllength $output_dir/amplicon.fasta --sizeout --output $output_dir/dereplicated.fasta --minuniquesize 10
+
 # Take non chimeric sequences
 #soft/vsearch --uchime_denovo $output_dir/dereplicated.fasta --nonchimeras $output_dir/non_chimera.fasta
+
 # Clustering with abundance
-soft/vsearch --cluster_size $output_dir/non_chimera.fasta --id 0.97 --centroids $output_dir/centroids.fasta --otutabout $output_dir/otu.tsv --relabel "OTU_"
+#soft/vsearch --cluster_size $output_dir/non_chimera.fasta --id 0.97 --centroids $output_dir/centroids.fasta --otutabout $output_dir/otu.tsv --relabel "OTU_"
 
 
+# Getting a count table
+#soft/vsearch --usearch_global $output_dir/amplicon.fasta --otutabout count_table.tsv --id 0.97 --db $output_dir/centroids.fasta
+
+# Annotate OTU
+soft/vsearch --usearch_global $output_dir/amplicon.fasta --db databases/mock_16S_18S.fasta --id 0.97 --top_hits_only --userfields "query+target" --userout annotations.tsv
 
