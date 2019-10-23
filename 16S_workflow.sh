@@ -29,13 +29,16 @@ mkdir $output_dir
 
 # Trimming with AlienTrimmer, assuming only fastq in the raw reads directory
 # and merging with Vsearch.
-for file in $(ls $raw_reads_dir/ *_R1.fastq.gz); do
+for file in $(ls $raw_reads_dir/ *_R1.fastq); do
     name_R1="$file"
     name_R2=$(echo $file|sed "s:R1:R2:g")
     # Trimming.
-    java -jar soft/AlienTrimmer.jar -if $raw_reads_dir/$name_R1 -ir $raw_reads_dir/$name_R2 -q 20 -c databases/contaminants.fasta -of $output_dir/$name_R1 -or $output_dir/$name_R2
-    # Merging
-    echo soft/vsearch --fastq_mergepairs --fastaout name --label_suffix ";sample="
+    echo java -jar soft/AlienTrimmer.jar -if $raw_reads_dir/$name_R1 -ir $raw_reads_dir/$name_R2 -q 20 -c databases/contaminants.fasta -of $output_dir/$name_R1 -or $output_dir/$name_R2
+    # Merging.
+    sample_name=$(echo $file|sed "s:_R.\.fastq$::g")
+    echo soft/vsearch --fastq_mergepairs $output_dir/$name_R1 --reverse $output_dir/$name_R2 --fastaout $output_dir/$sample_name --label_suffix ";sample=$sample_name"
+    # Removing spaces.  
+    #sed $output_dir/$sample_name "s: ::g" \> $output_dir/$sample_name.no_space
 done
 
 
