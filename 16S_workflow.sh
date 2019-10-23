@@ -64,7 +64,7 @@ done
 
 
 ## Working on amplicon.fasta
-# Dereplicating the sequences.
+# Full-length dereplicatiion of the sequences.
 $software_dir/vsearch --derep_fulllength $output_dir/amplicon.fasta \
                       --output $output_dir/dereplicated.fasta \
                       --minuniquesize 10 --sizeout
@@ -88,5 +88,5 @@ $software_dir/vsearch --usearch_global $output_dir/amplicon.fasta \
 $software_dir/vsearch --usearch_global $output_dir/centroids.fasta \
                       --db $db_dir/mock_16S_18S.fasta \
                       --userout $output_dir/annotated.tsv \
-                      --id 0.97 --top_hits_only --userfields "query+target"
-
+                      --id 0.90 --top_hits_only --userfields "query+target"
+sed '1iOTU\tAnnotation' -i $output_dir/annotated.tsv
