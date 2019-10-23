@@ -59,5 +59,5 @@ done
 #soft/vsearch --usearch_global $output_dir/amplicon.fasta --otutabout count_table.tsv --id 0.97 --db $output_dir/centroids.fasta
 
 # Annotate OTU
-soft/vsearch --usearch_global $output_dir/amplicon.fasta --db databases/mock_16S_18S.fasta --id 0.97 --top_hits_only --userfields "query+target" --userout annotations.tsv
+soft/vsearch --usearch_global $output_dir/centroids.fasta --db databases/mock_16S_18S.fasta --id 0.97 --top_hits_only --userfields "query+target" --userout annotated.tsv
 
