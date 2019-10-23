@@ -38,7 +38,7 @@ for file in $(ls $raw_reads_dir/ *_R1.fastq); do
     sample_name=$(echo $file|sed "s:_R.\.fastq$::g")
     echo soft/vsearch --fastq_mergepairs $output_dir/$name_R1 --reverse $output_dir/$name_R2 --fastaout $output_dir/$sample_name --label_suffix ";sample=$sample_name"
     # Removing spaces.  
-    #sed $output_dir/$sample_name "s: ::g" \> $output_dir/$sample_name.no_space
+    sed "s: ::g" $output_dir/$sample_name >> amplicon.fasta
 done
 
 
